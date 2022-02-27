@@ -1,5 +1,7 @@
-const express = require('express')
-const dataManager=require('./dataManager')
+require('dotenv').config(); 
+const express = require('express');
+const dataManager=require('./dataManager');
+//TODO DELETE
 const cors=require('cors')
 const app = express()
 const port = process.env.PORT || 8080
@@ -8,6 +10,21 @@ const path=String.raw`C:\Users\eliyahu\Documents\פרויקטים\MyScoialNetwor
 //for dev only TODO: DELETE
 app.use(cors());
 
+app.use(express.json())
+
+app.post('/signIn',dataManager.singIn);
+
+app.post('/login',dataManager.logIn);
+
+app.get('/getData',dataManager.verifyJWT,(req, res)=>{
+    dataManager.getLatestXPosts(5,0).then(data=>{
+    res.json(data);
+    })
+})
+
+app.post('/post',dataManager.verifyJWT,dataManager.setPost);
+
+
 //simple http server
 app.use('/',express.static(path));
 
@@ -15,12 +32,6 @@ app.listen(port, () => {
     console.log(`listening on port ${port}`)
 })
 
-app.get('/getData',(req, res)=>{
-
-    dataManager.getLatestXPosts(5,0).then(data=>{
-    res.json(data);
-    })
-})
 
 
 

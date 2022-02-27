@@ -1,0 +1,31 @@
+POST http://localhost:80/signin 
+Content-Type:application/json
+{
+    "user":"Elnatan11",
+    "password":"E123456",
+    "email":"Dffdf@gmmd.com",
+    "gender":true
+}
+
+###
+POST http://localhost:80/login 
+Content-Type:application/json
+
+{
+    "user":"Elnatan11",
+    "password":"E123456"
+}
+
+###
+GET http://localhost:80/getData
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+
+###
+### testing post 
+POST http://localhost:80/post 
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+Content-Type:application/json
+
+{
+    "content":"new post"
+}
