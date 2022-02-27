@@ -4,6 +4,9 @@ const  User  = require("./schemas/User");
 const Post=require('./schemas/post');
 const  jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
+const likes = require("./schemas/likes");
+const comment = require("./schemas/comment");
+const { promise } = require("bcrypt/promises");
 
 
 
@@ -22,11 +25,35 @@ console.error(e)
  export the dataManager
 **/
  module.exports={
-   
-//set post function
+    /**
+     * add likes to the comment or post
+     */
+   addlike(req,res){
+      userID=req.user.id;
+      const {postCommentID} =req.body
+      //TODO::data validtion
+      if(!(postCommentID&&typeof postCommentID === "string"))
+       res.sendStatus(403)
+      
+       const like=new likes({
+         userID,
+         postCommentID
+       })
+       likes.save().then(
+          res.json({message:"success"})
+       )
+      
+         
+      
+   },
+
+   /**
+  set post function
+   */ 
   setPost(req,res) {
    userID=req.user.id;
    const {content}=req.body
+   //TODO ADD MORE DATA validation
    if(content&&typeof content === "string"){
      const newPost= new Post({
          userID : new mongoose.Types.ObjectId(userID),
@@ -52,19 +79,62 @@ console.error(e)
       }
  },
 
- //get posts from the DB from index to index.
+//   setComment(req,res) {
+//     userID=req.user.id;
+//     const {content,postID}=req.body
+//     //TODO ADD MORE DATA validation
+//     if(!(content&&typeof content === "string")(postID&&typeof postID === "string" )){
+//       res.status(403) //TODO CHECK REAL FROBIDDEN
+//    }
+  
+//    const newComment= new comment({
+//       userID : new mongoose.Types.ObjectId(userID),
+//       content : content
+//       })
+//    newComment.save().
+//          then(
+//           com=>Post.findById(postID).update
+//          .populate({ path: 'userID',select:["-password"]})
+//          .exec())
+//           //  .then( 
+//           //     post=>
+//           //     {post.populate( { path: 'userID',select:["-password"]})
+//           //     .exec()
+//           //     console.log(pst)
+//           //    }
+//           //     )
+//            .then(post=>res.json(post))
+//            .catch(err=>res.json({error:err}))
+       
+//   },
+
+ /**
+  get posts from the DB from index to index.
+  */
 async getLatestXPosts(numberOfPosts,from){
     const data= await (
         Post.find()
         .skip(from*numberOfPosts)
         .limit((from*numberOfPosts)+numberOfPosts)
         .populate( { path: 'userID',select:["-password"]}) //remove password from the select
+        .lean()
         .exec()
         )
-        return data
-
-
+        return  await Promise.all( data.map(
+          async x =>{ 
+           x.likes = await this.getLikes(x._id)
+           return x
+        })
+        )
+      //return data;
+},
+/**
+ search all the like for comment or post id
+ * */ 
+async getLikes(id){
+   return await likes.find().where('postCommentID').equals(id)
  },
+
 
 /**
 the sign in function
@@ -94,8 +164,9 @@ sends
    },
 
    /**
-
-    **/
+   login to the page
+   and sents jwt to the client
+   **/
    logIn(req,res){
    const{ user, password } =req.body;
     User.findOne({user}).then(
@@ -135,7 +206,10 @@ sends
        e=>console.log(e)
     )
    },
-
+/**
+the mittleware of the pogram checks if
+the jwt is valid.
+ */
 verifyJWT(req,res,next){
    const token=req.headers['x-access-token']?.split(' ')[1]
    if(token){

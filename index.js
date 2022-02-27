@@ -24,7 +24,7 @@ app.get('/getData',dataManager.verifyJWT,(req, res)=>{
 
 app.post('/post',dataManager.verifyJWT,dataManager.setPost);
 
-
+app.post('/like',dataManager.verifyJWT,dataManager.addlike)
 //simple http server
 app.use('/',express.static(path));
 
