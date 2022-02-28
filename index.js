@@ -15,7 +15,7 @@ app.post('/signIn',dataManager.singIn);
 
 app.post('/login',dataManager.logIn);
 
-app.post('/comment',dataManager.verifyJWT,dataManager.setComment)
+app.post('/comment',dataManager.verifyJWT,dataManager.addComment)
 app.get('/getData',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);

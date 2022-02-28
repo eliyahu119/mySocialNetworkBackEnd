@@ -22,7 +22,10 @@ console.error(e)
 }
 )
 
-const addLike= (res,req,userID,postCommentID)=>{
+/**
+ *add or remove like from the DB.
+ */
+const addOrRemoveLike= (res,req,userID,postCommentID)=>{
    likes.findOneAndDelete({ userID, postCommentID }).then(
       document => {
          if (document) {
@@ -41,6 +44,13 @@ const addLike= (res,req,userID,postCommentID)=>{
 )
 
 }
+
+/**
+ search all the like for comment or post id
+ * */ 
+  const getLikes=async (id)=>{
+   return await likes.find().where('postCommentID').equals(id)
+ }
 /**
  export the dataManager
 **/
@@ -59,12 +69,12 @@ const addLike= (res,req,userID,postCommentID)=>{
       Post.exists({_id:postCommentID}).then(
       exists=>{
       if(exists)
-         addLike(res,req,userID,postCommentID)
+         addOrRemoveLike(res,req,userID,postCommentID)
       else
       comment.exists({_id:postCommentID}).then(
       exists =>{  
          if(exists)
-         addLike(res,req,userID,postCommentID)
+         addOrRemoveLike(res,req,userID,postCommentID)
       else  
         res.status(403).json({meassage:"IVALID DATA"})
             //if there is like remove it, if not add it
@@ -107,8 +117,11 @@ const addLike= (res,req,userID,postCommentID)=>{
          res.sendStatus(403)
       }
  },
-
-  setComment(req,res) {
+ 
+/**
+ * add comment to post.
+ */
+  addComment(req,res) {
     userID=req.user.id;
     const {content,postID}=req.body
     //TODO ADD MORE DATA validation
@@ -149,22 +162,17 @@ async getLatestXPosts(numberOfPosts,from){
                async c=> {
               const userObject =  await  User.findById(c.userID).select(["-password"])
               c.userID =userObject
-              c.likes = await this.getLikes(c._id)
+              c.likes = await getLikes(c._id)
               return c
               }
             ))) 
-           x.likes = await this.getLikes(x._id)
+           x.likes = await getLikes(x._id)
            return x
         })
         )
       //return data;
 },
-/**
- search all the like for comment or post id
- * */ 
-async getLikes(id){
-   return await likes.find().where('postCommentID').equals(id)
- },
+
 
 
 /**
