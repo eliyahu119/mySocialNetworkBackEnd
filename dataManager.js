@@ -117,7 +117,6 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
          res.sendStatus(403)
       }
  },
- 
 /**
  * add comment to post.
  */
@@ -188,6 +187,7 @@ sends
    {
       res.status(422).json({message:"userName or Email already been used "});
    }
+   //TODO:: credbeility check. joi?
    password = await bcrypt.hash(password,10); //TODO: consider using salts instead of  rounds
    const dbUser=new User(
          {
