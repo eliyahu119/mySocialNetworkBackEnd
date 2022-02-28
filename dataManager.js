@@ -150,6 +150,7 @@ async getLatestXPosts(numberOfPosts,from){
         .limit((from*numberOfPosts)+numberOfPosts)
         .populate( { path: 'userID',select:["-password"]}) //remove password from the select
         .populate({path:'commentsID'})
+        .sort({'_id': -1})
         .lean()
         .exec()
         )
@@ -241,8 +242,7 @@ sends
     }
  
     
-    ).catch(
-       e=>console.log(e)
+    ).catch((e)=>res.status(500).json({message:`Error ${e} `})
     )
    },
 /**
