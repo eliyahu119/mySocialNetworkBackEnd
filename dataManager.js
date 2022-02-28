@@ -11,7 +11,8 @@ const { promise } = require("bcrypt/promises");
 
 
 
-const  ConnectionString = "mongodb+srv://Eliyahu299:EL1234EL@cluster0.goiyy.mongodb.net/MySocialNetwork?retryWrites=true&w=majority";
+const  ConnectionString = process.env.MONGO_CONNECT
+
 //connect to DB
 mongoose.connect(ConnectionString,()=>
 {
@@ -21,6 +22,25 @@ console.error(e)
 }
 )
 
+const addLike= (res,req,userID,postCommentID)=>{
+   likes.findOneAndDelete({ userID, postCommentID }).then(
+      document => {
+         if (document) {
+            res.json({ message: "removed like" })
+         }
+         else {
+            const like = new likes({
+               userID,
+               postCommentID
+            })
+            like.save().then(
+               res.json({ message: "added like" })
+            )
+         }
+}
+)
+
+}
 /**
  export the dataManager
 **/
@@ -29,23 +49,32 @@ console.error(e)
      * add likes to the comment or post
      */
    addlike(req,res){
-      userID=req.user.id;
+      const userID=req.user.id;
       const {postCommentID} =req.body
       //TODO::data validtion
       if(!(postCommentID&&typeof postCommentID === "string"))
-       res.sendStatus(403)
-      
-       const like=new likes({
-         userID,
-         postCommentID
-       })
-       likes.save().then(
-          res.json({message:"success"})
-       )
+      {
+         res.status(403).json({meassage:"IVALID DATA"})
+      }
+      Post.exists({_id:postCommentID}).then(
+      exists=>{
+      if(exists)
+         addLike(res,req,userID,postCommentID)
+      else
+      comment.exists({_id:postCommentID}).then(
+      exists =>{  
+         if(exists)
+         addLike(res,req,userID,postCommentID)
+      else  
+        res.status(403).json({meassage:"IVALID DATA"})
+            //if there is like remove it, if not add it
+         }
+   
+    )})},
       
          
       
-   },
+   
 
    /**
   set post function
@@ -79,34 +108,25 @@ console.error(e)
       }
  },
 
-//   setComment(req,res) {
-//     userID=req.user.id;
-//     const {content,postID}=req.body
-//     //TODO ADD MORE DATA validation
-//     if(!(content&&typeof content === "string")(postID&&typeof postID === "string" )){
-//       res.status(403) //TODO CHECK REAL FROBIDDEN
-//    }
+  setComment(req,res) {
+    userID=req.user.id;
+    const {content,postID}=req.body
+    //TODO ADD MORE DATA validation
+    if(!(content&&typeof content === "string")&&(postID&&typeof postID === "string" )){
+      res.status(403) 
+   }
   
-//    const newComment= new comment({
-//       userID : new mongoose.Types.ObjectId(userID),
-//       content : content
-//       })
-//    newComment.save().
-//          then(
-//           com=>Post.findById(postID).update
-//          .populate({ path: 'userID',select:["-password"]})
-//          .exec())
-//           //  .then( 
-//           //     post=>
-//           //     {post.populate( { path: 'userID',select:["-password"]})
-//           //     .exec()
-//           //     console.log(pst)
-//           //    }
-//           //     )
-//            .then(post=>res.json(post))
-//            .catch(err=>res.json({error:err}))
+   const newComment= new comment({
+      userID : new mongoose.Types.ObjectId(userID),
+      content : content
+      })
+
+   newComment.save().
+         then(com=>Post.findByIdAndUpdate(postID,{$push:{commentsID:[com._id]}}))
+         .then(()=>res.status(200).json({meassage:"success"}))
+         .catch(err=>res.status(500).json({error:err}))
        
-//   },
+ },
 
  /**
   get posts from the DB from index to index.
@@ -117,11 +137,22 @@ async getLatestXPosts(numberOfPosts,from){
         .skip(from*numberOfPosts)
         .limit((from*numberOfPosts)+numberOfPosts)
         .populate( { path: 'userID',select:["-password"]}) //remove password from the select
+        .populate({path:'commentsID'})
         .lean()
         .exec()
         )
         return  await Promise.all( data.map(
-          async x =>{ 
+          async x =>{
+             //add likes and comments to the post  
+            x?.commentsID&&(await Promise.all(
+            x.commentsID.map(
+               async c=> {
+              const userObject =  await  User.findById(c.userID).select(["-password"])
+              c.userID =userObject
+              c.likes = await this.getLikes(c._id)
+              return c
+              }
+            ))) 
            x.likes = await this.getLikes(x._id)
            return x
         })
@@ -207,7 +238,7 @@ sends
     )
    },
 /**
-the mittleware of the pogram checks if
+the mittleware of the pogram, checks if
 the jwt is valid.
  */
 verifyJWT(req,res,next){

@@ -11,11 +11,11 @@ const path=String.raw`C:\Users\eliyahu\Documents\פרויקטים\MyScoialNetwor
 app.use(cors());
 
 app.use(express.json())
-
 app.post('/signIn',dataManager.singIn);
 
 app.post('/login',dataManager.logIn);
 
+app.post('/comment',dataManager.verifyJWT,dataManager.setComment)
 app.get('/getData',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);

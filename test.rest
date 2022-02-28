@@ -39,3 +39,14 @@ Content-Type:application/json
 {
     "postCommentID":"6213a9ac0be39628080e8c9f"
 }
+
+###
+POST http://localhost:80/comment 
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+Content-Type:application/json
+
+{
+    "postID":"6213a9ac0be39628080e8c9f",
+    "content":"hello world"
+    
+}
