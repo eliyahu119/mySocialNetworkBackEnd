@@ -209,6 +209,10 @@ sends
    **/
    logIn(req,res){
    const{ user, password } =req.body;
+   //check if password or user is not string
+   /*
+   HERE
+   */
     User.findOne({user}).then(
     DBuser=>{
        if(!DBuser)

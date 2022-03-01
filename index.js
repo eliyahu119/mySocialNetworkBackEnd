@@ -1,6 +1,7 @@
 require('dotenv').config(); 
 const express = require('express');
 const dataManager=require('./dataManager');
+const bodyParser=require('body-parser')
 //TODO DELETE
 const cors=require('cors')
 const app = express()
@@ -9,7 +10,7 @@ const path=String.raw`C:\Users\eliyahu\Documents\פרויקטים\MyScoialNetwor
  
 //for dev only TODO: DELETE
 app.use(cors());
-
+app.use(bodyParser.json())
 app.use(express.json())
 app.post('/signIn',dataManager.singIn);
 
@@ -20,6 +21,9 @@ app.get('/getData',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
     })
+})
+app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
+    res.status(200).json({isLoggedIn:true})
 })
 
 app.post('/post',dataManager.verifyJWT,dataManager.setPost);

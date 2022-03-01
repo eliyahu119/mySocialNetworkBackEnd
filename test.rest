@@ -1,5 +1,6 @@
 POST http://localhost:80/signin 
 Content-Type:application/json
+
 {
     "user":"Elnatan11",
     "password":"E123456",
@@ -8,7 +9,7 @@ Content-Type:application/json
 }
 
 ###
-POST http://localhost:80/login 
+POST http://127.0.0.1:80/login 
 Content-Type:application/json
 
 {
@@ -27,7 +28,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "content":"new post"
+    "content":"הפוסט החדש שלי"
 }
 
 ###
@@ -37,7 +38,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postCommentID":"6213a9ac0be39628080e8c9f"
+    "postCommentID":"621cc1fa9b5d8d9144ad4721"
 }
 
 ###
@@ -50,3 +51,9 @@ Content-Type:application/json
     "content":"hello world"
     
 }
+
+
+###
+
+GET http://localhost:80/isUserAuth 
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
