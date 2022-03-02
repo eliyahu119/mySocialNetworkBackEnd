@@ -2,9 +2,9 @@ POST http://localhost:80/signin
 Content-Type:application/json
 
 {
-    "user":"Elnatan11",
+    "user":"Eliyahu4",
     "password":"E123456",
-    "email":"Dffdf@gmmd.com",
+    "email":"Dffd4f@gmmd.com",
     "gender":true
 }
 
@@ -13,7 +13,7 @@ POST http://127.0.0.1:80/login
 Content-Type:application/json
 
 {
-    "user":"Elnatan11",
+    "user":"eliran222",
     "password":"E123456"
 }
 
@@ -24,11 +24,11 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 ###
 ### testing post 
 POST http://localhost:80/post 
-x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0ZDUxNzRjZjgxNjk0MGY4YTdiMiIsInVzZXIiOiJzaGlyYTM0MzIiLCJpYXQiOjE2NDYyMTg1OTQsImV4cCI6MTY0ODgxMDU5NH0._r-0bIbV3X7-KZUG2yTtpuC1BmmzzymT6qEevI95L5E
 Content-Type:application/json
 
 {
-    "content":"הפוסט החדש שלי"
+    "content":"אני אוהב שוקולד"
 }
 
 ###
@@ -47,8 +47,8 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postID":"6213a9ac0be39628080e8c9f",
-    "content":"hello world"
+    "postID":"621f4ee074cf816940f8a804",
+    "content":"יש לך פוסט יפהפה"
     
 }
 

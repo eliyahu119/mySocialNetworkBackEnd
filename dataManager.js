@@ -132,12 +132,32 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
       userID : new mongoose.Types.ObjectId(userID),
       content : content
       })
-
+   Post.exists({_id:postID}).lean().exec().then(
+   exsist=> {
+   if(exsist){
+  let insertedCommentiD;
    newComment.save().
-         then(com=>
-            Post.findByIdAndUpdate(postID,{$push:{commentsID:[com._id]}}))
-         .then(()=>res.status(200).json({meassage:"success"}))
-         .catch(err=>res.status(500).json({error:err}))
+         then(com=>{
+         insertedCommentiD=com._id.toString()
+         //return the promis of the find
+         return Post.findByIdAndUpdate(postID,{$push:{commentsID:[insertedCommentiD]}})
+         })
+         // .then(()=> 
+         // comment.findById('621fc5a898db7d65f61ca0f4').populate({ path: 'userID',select:["-password"]}).exec()
+         // )
+         .then((data)=>{
+         //let id= insertedComment
+         comment.findById(insertedCommentiD).populate({ path: 'userID',select:["-password"]}).exec()
+         .then(
+         data=>res.status(200).json({meassage:"success",data:data})
+         ) 
+      })
+         .catch(err=>res.status(500).json({error:"here"}))
+   }else{
+      res.status(404).json({message:"post wasn't found"})
+   }
+}
+  ).catch(e=>res.status(500).json({message:"the problem is here"}))
        
  },
 
