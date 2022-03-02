@@ -49,7 +49,7 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
  search all the like for comment or post id
  * */ 
   const getLikes=async (id)=>{
-   return await likes.find().where('postCommentID').equals(id)
+   return await likes.find().where('postCommentID').equals(id).distinct("userID").exec()
  }
 /**
  export the dataManager
@@ -134,7 +134,8 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
       })
 
    newComment.save().
-         then(com=>Post.findByIdAndUpdate(postID,{$push:{commentsID:[com._id]}}))
+         then(com=>
+            Post.findByIdAndUpdate(postID,{$push:{commentsID:[com._id]}}))
          .then(()=>res.status(200).json({meassage:"success"}))
          .catch(err=>res.status(500).json({error:err}))
        
@@ -208,22 +209,22 @@ sends
    and sents jwt to the client
    **/
    logIn(req,res){
-   const{ user, password } =req.body;
+   const { user, password } =req.body;
    //check if password or user is not string
    /*
    HERE
    */
-    User.findOne({user}).then(
+    User.findOne({user}).lean().then(
     DBuser=>{
        if(!DBuser)
           return res.status(400).json({message:'Invalid username or password'});
-          bcrypt.compare(password,DBuser.password).then(
+          const {password : DBpassword , ...userInfo} =DBuser
+          bcrypt.compare(password,DBpassword).then(
           isCorrect=>{
              if(isCorrect){
                 const payload={
                    id:DBuser._id,
-                   user:DBuser.user,
-                   gender:DBuser.gender
+                   user:DBuser.user, 
                   }
                   jwt.sign(payload,
                   process.env.JWT_SECRET,
@@ -232,7 +233,8 @@ sends
                   if(err) return res.status(500).json({message:err})
                   return res.status(200).json({
                      message:"Success",
-                     token: "Bearer " + token
+                     token: `Bearer ${token}`,
+                     userInfo 
                   })
                   }
                   )
