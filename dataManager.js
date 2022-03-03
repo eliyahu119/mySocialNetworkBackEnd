@@ -169,29 +169,35 @@ async getLatestXPosts(numberOfPosts,from){
         Post.find()
         .skip(from*numberOfPosts)
         .limit((from*numberOfPosts)+numberOfPosts)
-        .populate( { path: 'userID',select:["-password"]}) //remove password from the select
-        .populate({path:'commentsID'})
+        .populate({path: 'userID',select:["-password"]})
+        .populate({path:'commentsID',options:{sort:{_id:-1}}})
         .sort({'_id': -1})
         .lean()
         .exec()
         )
-        return  await Promise.all( data.map(
-          async x =>{
-             //add likes and comments to the post  
-            x?.commentsID&&(await Promise.all(
-            x.commentsID.map(
+         //HEAVY CODE
+         console.time('HEAVY')  //use time cause profile doesnt work in vs code
+        // let result=data;
+         let result =  await Promise.all( data.map(
+           async x =>{
+              //add likes and comments to the post  
+             x?.commentsID&&(await Promise.all(
+             x.commentsID.map(
                async c=> {
-              const userObject =  await  User.findById(c.userID).select(["-password"])
-              c.userID =userObject
-              c.likes = await getLikes(c._id)
-              return c
-              }
-            ))) 
-           x.likes = await getLikes(x._id)
-           return x
-        })
-        )
-      //return data;
+               const userObject =  await  User.findById(c.userID).select(["-password"])
+               c.userID =userObject
+               c.likes = await getLikes(c._id)
+               return c
+               }
+             ))) 
+            x.likes = await getLikes(x._id)
+         
+            return x
+         })
+         )
+         //HEAVY CODE 
+         console.timeEnd('HEAVY')
+      return result;
 },
 
 
