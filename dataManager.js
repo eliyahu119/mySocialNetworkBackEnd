@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const bcrypt =require('bcrypt')
-const  User  = require("./schemas/User");
+const  users  = require("./schemas/users");
 const Posts=require('./schemas/post');
 const  jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
@@ -230,14 +230,11 @@ async getLatestXPosts(numberOfPosts,from){
              x?.commentsID&&(await Promise.all(
              x.commentsID.map(
                async c=> {
-               const userObject =  await  User.findById(c.userID).select(["-password"])
+               const userObject =  await  users.findById(c.userID).select(["-password"])
                c.userID =userObject
-               c.likes = await getLikes(c._id)
                return c
                }
              ))) 
-            x.likes = await getLikes(x._id)
-         
             return x
          })
          )
@@ -263,13 +260,13 @@ sends
    }
 
    let {user,password,email,gender}=req.body
-   if (await User.exists().or([{email},{user}]))
+   if (await users.exists().or([{email},{user}]))
    {
       res.status(422).json({message:"userName or Email already been used "});
    }
    //TODO:: credbeility check. joi?
    password = await bcrypt.hash(password,10); //TODO: consider using salts instead of  rounds
-   const dbUser=new User(
+   const dbUser=new users(
          {
             user ,
             password ,
@@ -292,7 +289,7 @@ sends
    /*
    HERE
    */
-    User.findOne({user}).lean().then(
+    users.findOne({user}).lean().then(
     DBuser=>{
        if(!DBuser)
           return res.status(400).json({message:'Invalid username or password'});
