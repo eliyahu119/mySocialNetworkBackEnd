@@ -2,6 +2,13 @@ require('dotenv').config();
 const express = require('express');
 const dataManager=require('./dataManager');
 const bodyParser=require('body-parser')
+const {
+    validateSignin,
+    validatesLogin,
+    valdatesAddLike,
+    valdatesComment,
+    validtaePost
+} =require('./validation')
 //TODO DELETE
 const cors=require('cors')
 const app = express()
@@ -12,11 +19,11 @@ const path=String.raw`C:\Users\eliyahu\Documents\פרויקטים\MyScoialNetwor
 app.use(cors());
 app.use(bodyParser.json())
 app.use(express.json())
-app.post('/signIn',dataManager.singIn);
+app.post('/signIn',validateSignin,dataManager.singIn); //
 
-app.post('/login',dataManager.logIn);
+app.post('/login',validatesLogin,dataManager.logIn);  // 
 
-app.post('/comment',dataManager.verifyJWT,dataManager.addComment)
+app.post('/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)
 app.get('/getData',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
@@ -26,9 +33,9 @@ app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
     res.status(200).json({isLoggedIn:true})
 })
 
-app.post('/post',dataManager.verifyJWT,dataManager.setPost);
+app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
 
-app.post('/like',dataManager.verifyJWT,dataManager.addlike)
+app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.addlike)//
 //simple http server
 app.use('/',express.static(path));
 
