@@ -7,5 +7,5 @@ const userSchema= new mongoose.Schema({
     email: {type: String,required: true,unique: true },
     gender : {type : Boolean, default:true}  //true is male, false female
 })
-module.exports=mongoose.model("User",userSchema)
+module.exports=mongoose.model("users",userSchema)
 

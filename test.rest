@@ -2,7 +2,7 @@ POST http://localhost:80/signin
 Content-Type:application/json
 
 {
-    "user":"Eliyahu4",
+    "user":"sff23",
     "password":"E123456",
     "email":"Dffd4f@gmmd.com",
     "gender":true
@@ -38,16 +38,24 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postCommentID":"621cc1fa9b5d8d9144ad4721"
+    "postCommentID":"621fcf8af1dafacfbde2cdcb"
 }
 
+###
+POST http://localhost:80/rlike 
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+Content-Type:application/json
+
+{
+    "postCommentID":"621fcf8af1dafacfbde2cdcb"
+}
 ###
 POST http://localhost:80/comment 
 x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
 Content-Type:application/json
 
 {
-    "postID":"621f4ee074cf816940f8a804",
+    "postID":"6223ad46ca195fe26e3ff315",
     "content":"יש לך פוסט יפהפה"
     
 }

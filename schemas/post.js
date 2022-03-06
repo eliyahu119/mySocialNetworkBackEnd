@@ -11,6 +11,6 @@ const postSchema= new mongoose.Schema({
     //chose to put a ref here because the project is small
     //and not going to be bigger in the future, so this is the best practice for this situation. 
     commentsID :[{type:mongoose.Types.ObjectId, ref:'comment' }],
-    // likes: [ {type:mongoose.Types.ObjectId , ref:'User'}]
+    likes: [ {type:mongoose.Types.ObjectId , ref:'User' }]
 })
 module.exports=mongoose.model("post",postSchema)

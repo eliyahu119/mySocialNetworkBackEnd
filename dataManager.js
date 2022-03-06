@@ -1,12 +1,14 @@
 const { default: mongoose } = require("mongoose");
 const bcrypt =require('bcrypt')
 const  User  = require("./schemas/User");
-const Post=require('./schemas/post');
+const Posts=require('./schemas/post');
 const  jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
 const likes = require("./schemas/likes");
 const comment = require("./schemas/comment");
 const { promise } = require("bcrypt/promises");
+const res = require("express/lib/response");
+
 
 
 
@@ -22,28 +24,74 @@ console.error(e)
 }
 )
 
+
+// #region my 
 /**
- *add or remove like from the DB.
+ *add  like from the DB.
  */
-const addOrRemoveLike= (res,req,userID,postCommentID)=>{
-   likes.findOneAndDelete({ userID, postCommentID }).then(
-      document => {
-         if (document) {
-            res.json({ message: "removed like" })
-         }
-         else {
-            const like = new likes({
-               userID,
-               postCommentID
-            })
-            like.save().then(
-               res.json({ message: "added like" })
-            )
-         }
-}
-)
+const addLike= (req,res)=>{
+    const userID =mongoose.Types.ObjectId(req.user.id)
+    const {postCommentID,postOrComment } = req.body;
+    //postCommentID=mongoose.Types.ObjectId(postCommentID);
+   if(postOrComment){
+      Posts.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}}).then(
+         res.json({message:'added like'})
+      ).catch(
+        e => res.status(500).json({message:e.message})
+      )
+   }else{
+      comment.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}}).then(
+        (r)=> res.json({message:'added like'})
+      ).catch(
+        e => res.status(500).json({message:e.message})
+      )
+   }
 
 }
+
+
+
+//remove like from the DB.
+const removeLike= (req,res)=>{
+   const userID =mongoose.Types.ObjectId(req.user.id)
+   const {postCommentID,postOrComment } = req.body;
+  if(postOrComment){
+     Posts.findByIdAndUpdate(postCommentID,{
+         $pull:{likes:userID}}
+        ).then(
+       res.json({message:'removed like'})
+     ).catch(
+       e => res.status(500).json({message:e.message})
+     )
+  }else{
+     comment.findByIdAndUpdate(postCommentID,{$pull:{likes:userID}}).then(
+        res.json({message:'removed like'})
+     ).catch(
+       e => res.status(500).json({message:e.message})
+     )
+  }
+  //    likes.findOneAndDelete({ userID, postCommentID }).then(
+//       document => {
+//          if (document) {
+//             res.json({ message: "removed like" })
+//          }
+//          else {
+//             const like = new likes({
+//                userID,
+//                postCommentID
+//             })
+//             like.save().then(
+//                res.json({ message: "added like" })
+//             )
+//          }
+// }
+// )
+
+}
+
+// #endregion
+
+//////////////////////////////////
 
 /**
  search all the like for comment or post id
@@ -56,32 +104,35 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
 **/
  module.exports={
     /**
-     * add likes to the comment or post
+     *checks if post or comments exists
      */
-   addlike(req,res){
+   checkPostOrCommentsExists(req,res,next){
       const userID=req.user.id;
       const {postCommentID} =req.body
-      //TODO::data validtion
-      if(!(postCommentID&&typeof postCommentID === "string"))
-      {
-         res.status(403).json({meassage:"IVALID DATA"})
-      }
-      Post.exists({_id:postCommentID}).then(
+      Posts.exists({_id:postCommentID}).then(
       exists=>{
       if(exists)
-         addOrRemoveLike(res,req,userID,postCommentID)
+      {
+         req.body.postOrComment=true; //like
+         next()
+      }  
       else
-      comment.exists({_id:postCommentID}).then(
+         comment.exists({_id:postCommentID}).then(
       exists =>{  
          if(exists)
-         addOrRemoveLike(res,req,userID,postCommentID)
+         {
+            req.body.postOrComment=false; //comment
+            next()
+         }  
       else  
         res.status(403).json({meassage:"IVALID DATA"})
-            //if there is like remove it, if not add it
-         }
+         //if there is like remove it, if not add it
+      }
    
     )})},
-      
+    addLike,
+    removeLike,
+  
          
       
    
@@ -94,13 +145,13 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
    const {content}=req.body
    //TODO ADD MORE DATA validation
    if(content&&typeof content === "string"){
-     const newPost= new Post({
+     const newPost= new Posts({
          userID : new mongoose.Types.ObjectId(userID),
          content : content
          })
       //TODO: MAKE THIS CRAP WORK WITH SAVE ONLY
         newPost.save().
-        then(post=>Post.findById(post.id)
+        then(post=>Posts.findById(post.id)
         .populate({ path: 'userID',select:["-password"]})
         .exec())
 
@@ -122,17 +173,12 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
  */
   addComment(req,res) {
     userID=req.user.id;
-    const {content,postID}=req.body
-    //TODO ADD MORE DATA validation
-    if(!(content&&typeof content === "string")&&(postID&&typeof postID === "string" )){
-      res.status(403) 
-   }
-  
+   const {content,postID}=req.body
    const newComment= new comment({
       userID : new mongoose.Types.ObjectId(userID),
       content : content
       })
-   Post.exists({_id:postID}).lean().exec().then(
+   Posts.exists({_id:postID}).lean().exec().then(
    exsist=> {
    if(exsist){
   let insertedCommentiD;
@@ -140,7 +186,7 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
          then(com=>{
          insertedCommentiD=com._id.toString()
          //return the promis of the find
-         return Post.findByIdAndUpdate(postID,{$push:{commentsID:[insertedCommentiD]}})
+         return Posts.findByIdAndUpdate(postID,{$push:{commentsID:[insertedCommentiD]}})
          })
          // .then(()=> 
          // comment.findById('621fc5a898db7d65f61ca0f4').populate({ path: 'userID',select:["-password"]}).exec()
@@ -166,7 +212,7 @@ const addOrRemoveLike= (res,req,userID,postCommentID)=>{
   */
 async getLatestXPosts(numberOfPosts,from){
     const data= await (
-        Post.find()
+        Posts.find()
         .skip(from*numberOfPosts)
         .limit((from*numberOfPosts)+numberOfPosts)
         .populate({path: 'userID',select:["-password"]})
@@ -210,6 +256,12 @@ sends
 200 if all is well.
  **/
    async singIn(req,res){
+   const response=validateSignin(req.body)
+   if(response.error){
+      res.status(403).json({meassage:response.error.details})
+      return;
+   }
+
    let {user,password,email,gender}=req.body
    if (await User.exists().or([{email},{user}]))
    {

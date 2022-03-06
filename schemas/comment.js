@@ -6,6 +6,6 @@ const commentSchema= new mongoose.Schema({
     content : {type: String,required: true },
     date :{type : Date,default:()=>Date.now()} ,
     //explained why i chose to do it embeded in 'post.js'.
-    // likes: [ {type:mongoose.Types.ObjectId , ref:'User'}]    
+     likes: [ {type:mongoose.Types.ObjectId , ref:'User'}]    
 })
 module.exports=mongoose.model("comment",commentSchema)

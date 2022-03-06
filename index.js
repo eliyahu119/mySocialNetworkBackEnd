@@ -35,7 +35,8 @@ app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
 
 app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
 
-app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.addlike)//
+app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
+app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//
 //simple http server
 app.use('/',express.static(path));
 
