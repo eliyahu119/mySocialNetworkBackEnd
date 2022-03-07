@@ -8,7 +8,8 @@ const likes = require("./schemas/likes");
 const comment = require("./schemas/comment");
 const { promise } = require("bcrypt/promises");
 const res = require("express/lib/response");
-
+const postAggregate = require("./schemas/postAggregate");
+ 
 
 
 
@@ -211,59 +212,33 @@ const removeLike= (req,res)=>{
   get posts from the DB from index to index.
   */
 async getLatestXPosts(numberOfPosts,from){
-    const data= await (
-        Posts.find()
-        .skip(from*numberOfPosts)
-        .limit((from*numberOfPosts)+numberOfPosts)
-        .populate({path: 'userID',select:["-password"]})
-        .populate({path:'commentsID',options:{sort:{_id:-1}}})
-        .sort({'_id': -1})
-        .lean()
-        .exec()
-        )
-         //HEAVY CODE
-         console.time('HEAVY')  //use time cause profile doesnt work in vs code
-        // let result=data;
-         let result =  await Promise.all( data.map(
-           async x =>{
-              //add likes and comments to the post  
-             x?.commentsID&&(await Promise.all(
-             x.commentsID.map(
-               async c=> {
-               const userObject =  await  users.findById(c.userID).select(["-password"])
-               c.userID =userObject
-               return c
-               }
-             ))) 
-            return x
-         })
-         )
-         //HEAVY CODE 
-         console.timeEnd('HEAVY')
-      return result;
+    const data= await Posts.aggregate(postAggregate)
+    return data
 },
-
-
+/**
+ * 422 if userName or Email already been used.
+ */
+async checkIfSignedIn(req,res,next){
+  let {user,email}=req.body
+   if (await users.exists().or([{email},{user}]))
+   {
+      res.status(422).json({message:"userName or Email already been used "});
+      
+   }
+    next();
+},
 
 /**
 the sign in function
 sends 
-422 if userName or Email already been used.
+
 500 if there is a internal server(db) error.
 200 if all is well.
  **/
    async singIn(req,res){
-   const response=validateSignin(req.body)
-   if(response.error){
-      res.status(403).json({meassage:response.error.details})
-      return;
-   }
-
-   let {user,password,email,gender}=req.body
-   if (await users.exists().or([{email},{user}]))
-   {
-      res.status(422).json({message:"userName or Email already been used "});
-   }
+     
+    let {user,password,email,gender}=req.body
+  
    //TODO:: credbeility check. joi?
    password = await bcrypt.hash(password,10); //TODO: consider using salts instead of  rounds
    const dbUser=new users(

@@ -10,16 +10,25 @@ const {
     validtaePost
 } =require('./validation')
 //TODO DELETE
-const cors=require('cors')
+const cors=require('cors');
+const path = require('path');
+
+
+
 const app = express()
 const port = process.env.PORT || 8080
-const path=String.raw`C:\Users\eliyahu\Documents\פרויקטים\MyScoialNetwork\mysocialnetworkfrontend\public`
- 
+
+
 //for dev only TODO: DELETE
 app.use(cors());
 app.use(bodyParser.json())
 app.use(express.json())
-app.post('/signIn',validateSignin,dataManager.singIn); //
+
+
+
+
+
+app.post('/signIn',validateSignin,dataManager.checkIfSignedIn,dataManager.singIn); //
 
 app.post('/login',validatesLogin,dataManager.logIn);  // 
 
@@ -37,8 +46,14 @@ app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
 
 app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
 app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//
+
 //simple http server
-app.use('/',express.static(path));
+//const path='./build'
+
+app.use('/',express.static(path.resolve('./build')));
+app.get('*', (req,res) =>{
+    res.sendFile(path.resolve('./build/index.html'));
+});
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`)

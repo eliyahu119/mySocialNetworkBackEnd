@@ -33,10 +33,10 @@ function validateSignin(req,res,next)
                
                 .required(),
     password :Joi.string()
-                 .min(8)
+                 .min(7)
                  .max(12)
-                 .alphanum()
                  .trim()
+                 .alphanum()
                  .required(),
     gender : Joi.bool()
              .optional()
@@ -54,7 +54,7 @@ function validatesLogin(req,res,next){
              .alphanum()
             .required(),
     password :Joi.string()
-                 .min(8)
+                 .min(7)
                  .max(12)
                  .alphanum()
                  .trim()
