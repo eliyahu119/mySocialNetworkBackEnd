@@ -225,7 +225,8 @@ async checkIfSignedIn(req,res,next){
       res.status(422).json({message:"userName or Email already been used "});
       
    }
-    next();
+   else
+   next();
 },
 
 /**

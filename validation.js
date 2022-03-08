@@ -100,7 +100,7 @@ function validation(JoiSchema,res, req, next) {
     let validated = JoiSchema.validate(value);
     if (validated.error) {
         // console.log(validated.error.details)
-        res.status(403).json({ message: validated.error.details });
+        res.status(403).json({ message: validated.error.details[0].message });
     } else {
         
         req.body = validated.value;
