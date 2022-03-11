@@ -37,6 +37,7 @@ module.exports = postArgigate =  [
         "userID" : 1,
         "content":1,
         "likes":1,
+        'date':1,
         
         "commentsID": {
           "$map": {
