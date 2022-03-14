@@ -4,10 +4,7 @@ const  users  = require("./schemas/users");
 const Posts=require('./schemas/post');
 const  jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
-const likes = require("./schemas/likes");
 const comment = require("./schemas/comment");
-const { promise } = require("bcrypt/promises");
-const res = require("express/lib/response");
 const postAggregate = require("./schemas/postAggregate");
  
 
