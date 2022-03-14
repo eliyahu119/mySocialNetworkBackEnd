@@ -28,7 +28,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0ZDUx
 Content-Type:application/json
 
 {
-    "content":"אני אוהב שוקולד"
+    "content":"we love to write posts 2"
 }
 
 ###
@@ -38,7 +38,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postCommentID":"621fcf8af1dafacfbde2cdcb"
+    "postCommentID":"6224a77580ea9ce759f41eaf"
 }
 
 ###
@@ -47,7 +47,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postCommentID":"621fcf8af1dafacfbde2cdcb"
+    "postCommentID":"6224a77580ea9ce759f41eaf"
 }
 ###
 POST http://localhost:80/comment 
@@ -55,7 +55,7 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postID":"6223ad46ca195fe26e3ff315",
+    "postID":"6224a7aef648138258336806",
     "content":"יש לך פוסט יפהפה"
     
 }
