@@ -296,7 +296,8 @@ sends
     }
  
     
-    ).catch((e)=>res.status(500).json({message:`Error ${e} `})
+    ).catch(
+       (e)=>res.status(500).json({message:`Error ${e} `})
     )
    },
 /**
