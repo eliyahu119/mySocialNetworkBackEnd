@@ -49,7 +49,7 @@ app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrC
 
 app.use('/',express.static(path.resolve('./public')));
 app.get('*', (req,res) =>{
-    res.sendFile(path.resolve('./build/index.html'));
+    res.sendFile(path.resolve('./public/index.html'));
 });
 
 app.listen(port, () => {
