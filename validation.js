@@ -75,8 +75,8 @@ function valdatesAddLike(req,res,next){
 function valdatesComment(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
-                 .min(10)
-                 .max(60)
+                 .min(2)
+                 .max(100)
                  .trim(),
         postID:Joi.objectId()
                  
@@ -87,8 +87,8 @@ function valdatesComment(req,res,next){
 function validtaePost(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
-                 .min(10)
-                 .max(60)
+                  .min(2)
+                  .max(100)
                  .trim()
                  
  }); 
