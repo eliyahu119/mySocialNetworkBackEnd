@@ -20,9 +20,9 @@ function validateSignin(req,res,next)
     
     const JoiSchema = Joi.object({
     user: Joi.string()
-             .min(5)
-             .max(20)
              .trim()
+             .min(5)
+             .max(20) 
              .alphanum()
             .required(),
     email:  Joi.string()
@@ -33,9 +33,9 @@ function validateSignin(req,res,next)
                
                 .required(),
     password :Joi.string()
+                 .trim()
                  .min(7)
                  .max(12)
-                 .trim()
                  .alphanum()
                  .required(),
     gender : Joi.bool()
@@ -47,17 +47,17 @@ function validateSignin(req,res,next)
 function validatesLogin(req,res,next){
  
     const JoiSchema = Joi.object({
-    user: Joi.string()
+        user: Joi.string()
+             .trim()
              .min(5)
              .max(20)
-             .trim()
              .alphanum()
             .required(),
     password :Joi.string()
+                 .trim()
                  .min(7)
                  .max(12)
                  .alphanum()
-                 .trim()
                  .required()
  });
  validation(JoiSchema,  res, req, next);
@@ -75,9 +75,9 @@ function valdatesAddLike(req,res,next){
 function valdatesComment(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
+                 .trim()
                  .min(2)
-                 .max(100)
-                 .trim(),
+                 .max(100),
         postID:Joi.objectId()
                  
  });
@@ -87,9 +87,10 @@ function valdatesComment(req,res,next){
 function validtaePost(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
+                    .trim()
                   .min(2)
                   .max(100)
-                 .trim()
+                
                  
  }); 
     validation(JoiSchema,  res, req, next);
