@@ -9,8 +9,10 @@ MYSN (MY Social Network) is an app that connects people around discussion topics
 ![image](https://user-images.githubusercontent.com/54371245/159176597-449ba1bc-c271-418f-a6a2-b86c83a823ad.png)
 ## instalation and usage
 ### .env file
-need to add .env with 
-MONGO_CONNECT (mongodb connection string)
+
+#### needs to add .env with: 
+
+MONGO_CONNECT (mongodb connection string)\
 JWT_SECRET (JWT key)
 
 ### Available Scripts
