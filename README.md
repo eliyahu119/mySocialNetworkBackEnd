@@ -1,7 +1,7 @@
 # mySocialNetworkBackEnd
 This project was is part of the MySocialNetwork Project.
 
- the [fronEnd repo](https://github.com/eliyahu119/mySocialNetworkFrontEnd).
+ the [frontEnd repo](https://github.com/eliyahu119/mySocialNetworkFrontEnd).
 
 MYSN (MY Social Network) is an app that connects people around discussion topics. After registering an account, every user can share posts and engage with other users by liking and commenting on their content.
 
