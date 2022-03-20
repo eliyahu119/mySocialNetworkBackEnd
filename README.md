@@ -6,7 +6,8 @@ This project was is part of the MySocialNetwork Project.
 MYSN (MY Social Network) is an app that connects people around discussion topics. After registering an account, every user can share posts and engage with other users by liking and commenting on their content.
 
 
-![image](https://user-images.githubusercontent.com/54371245/159176597-449ba1bc-c271-418f-a6a2-b86c83a823ad.png)
+![image](https://user-images.githubusercontent.com/54371245/159177062-4a423bff-e8d3-409f-9c86-90a8cffaa9f2.png)
+
 ## instalation and usage
 ### .env file
 
