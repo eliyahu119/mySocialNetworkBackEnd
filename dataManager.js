@@ -141,8 +141,7 @@ const removeLike= (req,res)=>{
   setPost(req,res) {
    userID=req.user.id;
    const {content}=req.body
-   //TODO ADD MORE DATA validation
-   if(content&&typeof content === "string"){
+
      const newPost= new Posts({
          userID : new mongoose.Types.ObjectId(userID),
          content : content
@@ -162,9 +161,7 @@ const removeLike= (req,res)=>{
          //     )
           .then(post=>res.json(post))
           .catch(err=>res.json({error:err}))
-      }else{
-         res.sendStatus(403)
-      }
+     
  },
 /**
  * add comment to post.
@@ -213,6 +210,7 @@ async getLatestXPosts(numberOfPosts,from){
     return data
 },
 /**
+ * cheks if the user is sign
  * 422 if userName or Email already been used.
  */
 async checkIfSignedIn(req,res,next){
@@ -237,7 +235,7 @@ sends
      
     let {user,password,email,gender}=req.body
   
-   //TODO:: credbeility check. joi?
+   
    password = await bcrypt.hash(password,10); //TODO: consider using salts instead of  rounds
    const dbUser=new users(
          {

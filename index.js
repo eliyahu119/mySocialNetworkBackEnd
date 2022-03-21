@@ -46,10 +46,10 @@ app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrC
 
 //simple http server
 //const path='./build'
-
-app.use('/',express.static(path.resolve('./public')));
+const source=path.resolve('./')
+app.use('/',express.static(path.join(source,'public')));
 app.get('*', (req,res) =>{
-    res.sendFile(path.resolve('./public/index.html'));
+    res.sendFile(path.join(source,'public/index.html'));
 });
 
 app.listen(port, () => {
