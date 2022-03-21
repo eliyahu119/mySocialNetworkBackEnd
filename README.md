@@ -1,5 +1,5 @@
 # mySocialNetworkBackEnd
-This project was is part of the MySocialNetwork Project.
+This project is part of the MySocialNetwork Project.
 
  the [frontEnd repo](https://github.com/eliyahu119/mySocialNetworkFrontEnd).
 
