@@ -4,7 +4,7 @@ const  users  = require("./schemas/users");
 const Posts=require('./schemas/post');
 const  jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
-const comment = require("./schemas/comment");
+const comments = require("./schemas/comment");
 const postAggregate = require("./schemas/postAggregate");
  
 
@@ -23,33 +23,39 @@ console.error(e)
 )
 
 
-// #region my 
 /**
- *add  like from the DB.
+ *add  like to the post/comment.
+ * @param {object} req 
+ * @param {object} res 
  */
-const addLike= (req,res)=>{
+const addLike= async (req,res)=>{
     const userID =mongoose.Types.ObjectId(req.user.id)
     const {postCommentID,postOrComment } = req.body;
-    //postCommentID=mongoose.Types.ObjectId(postCommentID);
-   if(postOrComment){
-      Posts.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}}).then(
-         res.json({message:'added like'})
-      ).catch(
-        e => res.status(500).json({message:e.message})
-      )
+    //if true its post, false its a comment.
+    if(postOrComment){
+   try{
+     await Posts.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}})
+     res.json({message:'added like'})
+     }catch(e){
+      res.status(500).json({message:e.message})
+     }
    }else{
-      comment.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}}).then(
-        (r)=> res.json({message:'added like'})
-      ).catch(
-        e => res.status(500).json({message:e.message})
-      )
+   try{
+      await comments.findByIdAndUpdate(postCommentID,{$addToSet:{likes:[userID]}})
+      res.json({message:'added like'})
+   }catch(e){
+      res.status(500).json({message:e.message})
+      }
    }
 
 }
 
 
-
-//remove like from the DB.
+/**
+ * remove like from post/comment.
+ * @param {object} req 
+ * @param {object} res 
+ */
 const removeLike= (req,res)=>{
    const userID =mongoose.Types.ObjectId(req.user.id)
    const {postCommentID,postOrComment } = req.body;
@@ -62,41 +68,17 @@ const removeLike= (req,res)=>{
        e => res.status(500).json({message:e.message})
      )
   }else{
-     comment.findByIdAndUpdate(postCommentID,{$pull:{likes:userID}}).then(
+     comments.findByIdAndUpdate(postCommentID,{$pull:{likes:userID}}).then(
         res.json({message:'removed like'})
      ).catch(
        e => res.status(500).json({message:e.message})
      )
   }
-  //    likes.findOneAndDelete({ userID, postCommentID }).then(
-//       document => {
-//          if (document) {
-//             res.json({ message: "removed like" })
-//          }
-//          else {
-//             const like = new likes({
-//                userID,
-//                postCommentID
-//             })
-//             like.save().then(
-//                res.json({ message: "added like" })
-//             )
-//          }
-// }
-// )
-
 }
 
-// #endregion
 
-//////////////////////////////////
 
-/**
- search all the like for comment or post id
- * */ 
-  const getLikes=async (id)=>{
-   return await likes.find().where('postCommentID').equals(id).distinct("userID").exec()
- }
+
 /**
  export the dataManager
 **/
@@ -105,7 +87,6 @@ const removeLike= (req,res)=>{
      *checks if post or comments exists
      */
    checkPostOrCommentsExists(req,res,next){
-      const userID=req.user.id;
       const {postCommentID} =req.body
       Posts.exists({_id:postCommentID}).then(
       exists=>{
@@ -115,7 +96,7 @@ const removeLike= (req,res)=>{
          next()
       }  
       else
-         comment.exists({_id:postCommentID}).then(
+         comments.exists({_id:postCommentID}).then(
       exists =>{  
          if(exists)
          {
@@ -151,14 +132,6 @@ const removeLike= (req,res)=>{
         then(post=>Posts.findById(post.id)
         .populate({ path: 'userID',select:["-password"]})
         .exec())
-
-         //  .then( 
-         //     post=>
-         //     {post.populate( { path: 'userID',select:["-password"]})
-         //     .exec()
-         //     console.log(pst)
-         //    }
-         //     )
           .then(post=>res.json(post))
           .catch(err=>res.json({error:err}))
      
@@ -169,7 +142,7 @@ const removeLike= (req,res)=>{
   addComment(req,res) {
     userID=req.user.id;
    const {content,postID}=req.body
-   const newComment= new comment({
+   const newComment= new comments({
       userID : new mongoose.Types.ObjectId(userID),
       content : content
       })
@@ -188,7 +161,7 @@ const removeLike= (req,res)=>{
          // )
          .then((data)=>{
          //let id= insertedComment
-         comment.findById(insertedCommentiD).populate({ path: 'userID',select:["-password"]}).exec()
+         comments.findById(insertedCommentiD).populate({ path: 'userID',select:["-password"]}).exec()
          .then(
          data=>res.status(200).json({meassage:"success",data:data})
          ) 
@@ -209,33 +182,38 @@ async getLatestXPosts(numberOfPosts,from){
     const data= await Posts.aggregate(postAggregate)
     return data
 },
+
+
 /**
  * cheks if the user is sign
- * 422 if userName or Email already been used.
+ * 422 (Unprocessable Entity response) if userName or Email already been used.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
  */
 async checkIfSignedIn(req,res,next){
   let {user,email}=req.body
+  try{
    if (await users.exists().or([{email},{user}]))
    {
       res.status(422).json({message:"userName or Email already been used "});
-      
-   }
+   } 
    else
    next();
+}
+catch{
+   res.status(500).json({message:'the'})
+}
 },
 
 /**
 the sign in function
 sends 
-
 500 if there is a internal server(db) error.
 200 if all is well.
  **/
-   async singIn(req,res){
-     
-    let {user,password,email,gender}=req.body
-  
-   
+   async singIn(req,res){ 
+   let {user,password,email,gender}=req.body
    password = await bcrypt.hash(password,10); //TODO: consider using salts instead of  rounds
    const dbUser=new users(
          {
@@ -245,9 +223,13 @@ sends
             gender  //true is male, false female
          }
       );
-      dbUser.save()
-      .then(user=>res.status(200).json({message:`${user.user} has been added`}))
-      .catch(err=>res.status(500).json({message:`there was an internal problem, ${err}`})); //internal error
+   try{
+     const SavedUser= await dbUser.save()
+     res.status(200).json({message:`${SavedUser.user} has been added`});  
+   }catch(err){
+      err=>res.status(500).json({message:`there was an internal problem, ${err}`});
+   }
+
    },
 
    /**
@@ -295,7 +277,7 @@ sends
  
     
     ).catch(
-       (e)=>res.status(500).json({message:`Error ${e} `})
+       (e)=>res.status(500).json({message:`There was an internal problem, ${e} `})
     )
    },
 /**
