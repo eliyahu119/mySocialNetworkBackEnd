@@ -13,7 +13,10 @@ module.exports={
 }
 
 /**
- * validates the singin function.
+ * validates the singin parmaters.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
  */
 function validateSignin(req,res,next)
 {
@@ -43,7 +46,12 @@ function validateSignin(req,res,next)
  });
  validation(JoiSchema,  res, req, next);
 }
-
+/**
+ * validates the Login parmaters.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
+ */
 function validatesLogin(req,res,next){
  
     const JoiSchema = Joi.object({
@@ -63,6 +71,12 @@ function validatesLogin(req,res,next){
  validation(JoiSchema,  res, req, next);
 }
 
+/**
+ * validates the Like parmaters.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
+ */
 function valdatesAddLike(req,res,next){
     const JoiSchema = Joi.object({
        postCommentID :Joi.objectId()
@@ -71,7 +85,12 @@ function valdatesAddLike(req,res,next){
  validation(JoiSchema,  res, req, next);
 }
 
-
+/**
+ * validates the Comment parmaters.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
+ */
 function valdatesComment(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
@@ -84,6 +103,12 @@ function valdatesComment(req,res,next){
    validation(JoiSchema,  res, req, next);
 }
 
+/**
+ * validates the Post parmaters.
+ * @param {object} req 
+ * @param {object} res 
+ * @param {function} next 
+ */
 function validtaePost(req,res,next){
     const JoiSchema = Joi.object({
         content :Joi.string()
@@ -96,6 +121,14 @@ function validtaePost(req,res,next){
     validation(JoiSchema,  res, req, next);
 }
 
+/**
+ * validates the data format, and if its not good,
+ * set code 403 (Forbidden).
+ * @param {Joi.ObjectSchema<any>} JoiSchema 
+ * @param {object} res 
+ * @param {object} req 
+ * @param {function} next 
+ */
 function validation(JoiSchema,res, req, next) {
     let value=req.body
     let validated = JoiSchema.validate(value);
