@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const bcrypt = require('bcrypt')
 const users = require("./schemas/users");
-const Posts = require('./schemas/post');
+const posts = require('./schemas/posts');
 const jwt = require("jsonwebtoken");
 const req = require("express/lib/request");
 const comments = require("./schemas/comment");
@@ -31,21 +31,22 @@ const addLike = async (req, res) => {
    const userID = mongoose.Types.ObjectId(req.user.id)
    const { postCommentID, postOrComment } = req.body;
    //if true its post, false its a comment.
-   if (postOrComment) {
-      try {
-         await Posts.findByIdAndUpdate(postCommentID, { $addToSet: { likes: [userID] } })
+   try {
+      if (postOrComment) {
+
+         await posts.findByIdAndUpdate(postCommentID, { $addToSet: { likes: [userID] } })
          res.json({ message: 'added like' })
-      } catch (e) {
-         res.status(500).json({ message: e.message })
-      }
-   } else {
-      try {
+
+      } else {
+
          await comments.findByIdAndUpdate(postCommentID, { $addToSet: { likes: [userID] } })
          res.json({ message: 'added like' })
-      } catch (e) {
-         res.status(500).json({ message: e.message })
+
       }
+   } catch (e) {
+      res.status(500).json({ message: e.message })
    }
+
 
 }
 
@@ -55,24 +56,22 @@ const addLike = async (req, res) => {
  * @param {object} req 
  * @param {object} res 
  */
-const removeLike = (req, res) => {
+const removeLike = async (req, res) => {
    const userID = mongoose.Types.ObjectId(req.user.id)
    const { postCommentID, postOrComment } = req.body;
-   if (postOrComment) {
-      Posts.findByIdAndUpdate(postCommentID, {
-         $pull: { likes: userID }
+   try {
+      if (postOrComment) {
+         await posts.findByIdAndUpdate(postCommentID, {
+            $pull: { likes: userID }
+         })
+         res.json({ message: 'removed like' })
+      } else {
+         await comments.findByIdAndUpdate(postCommentID, { $pull: { likes: userID } })
+         res.json({ message: 'removed like' })
       }
-      ).then(
-         res.json({ message: 'removed like' })
-      ).catch(
-         e => res.status(500).json({ message: e.message })
-      )
-   } else {
-      comments.findByIdAndUpdate(postCommentID, { $pull: { likes: userID } }).then(
-         res.json({ message: 'removed like' })
-      ).catch(
-         e => res.status(500).json({ message: e.message })
-      )
+   }
+   catch (e) {
+      res.status(500).json({ message: e.message })
    }
 }
 
@@ -83,31 +82,36 @@ const removeLike = (req, res) => {
  export the dataManager
 **/
 module.exports = {
-   /**
-    *checks if post or comments exists
-    */
-   checkPostOrCommentsExists(req, res, next) {
-      const { postCommentID } = req.body
-      Posts.exists({ _id: postCommentID }).then(
-         exists => {
-            if (exists) {
-               req.body.postOrComment = true; //like
-               next()
-            }
-            else
-               comments.exists({ _id: postCommentID }).then(
-                  exists => {
-                     if (exists) {
-                        req.body.postOrComment = false; //comment
-                        next()
-                     }
-                     else
-                        res.status(403).json({ meassage: "IVALID DATA" })
-                     //if there is like remove it, if not add it
-                  }
-
-               )
-         })
+  /**
+   * checks if the id its post or comment,
+   * if its posts
+   * @param {*} req 
+   * @param {*} res 
+   * @param {*} next 
+   */
+   async checkPostOrCommentsExists(req, res, next) {
+      let { postCommentID } = req.body
+      try{
+      //let postCommentID ='621f49dc74cf816940f8a643';
+      const postExits = await posts.exists({_id:postCommentID})
+      if (postExits) {
+         req.body.postOrComment = true; //like
+         next();
+      }
+      else {
+         const CommentExits = await comments.exists({ _id: postCommentID });
+         if (CommentExits) {
+            req.body.postOrComment = false; //comment
+            next();
+         }
+         else
+            res.status(404).json({ meassage: "post or commant does not exist" });
+         //if there is like remove it, if not add it
+      }
+   }
+   catch(e){
+      res.status(500).json({message:e.meassage})
+   }
    },
    addLike,
    removeLike,
@@ -123,13 +127,13 @@ module.exports = {
       userID = req.user.id;
       const { content } = req.body
 
-      const newPost = new Posts({
+      const newPost = new posts({
          userID: new mongoose.Types.ObjectId(userID),
          content: content
       })
       //TODO: MAKE THIS CRAP WORK WITH SAVE ONLY
       newPost.save().
-         then(post => Posts.findById(post.id)
+         then(post => posts.findById(post.id)
             .populate({ path: 'userID', select: ["-password"] })
             .exec())
          .then(post => res.json(post))
@@ -146,7 +150,7 @@ module.exports = {
          userID: new mongoose.Types.ObjectId(userID),
          content: content
       })
-      Posts.exists({ _id: postID }).lean().exec().then(
+      posts.exists({ _id: postID }).lean().exec().then(
          exsist => {
             if (exsist) {
                let insertedCommentiD;
@@ -154,7 +158,7 @@ module.exports = {
                   then(com => {
                      insertedCommentiD = com._id.toString()
                      //return the promis of the find
-                     return Posts.findByIdAndUpdate(postID, { $push: { commentsID: [insertedCommentiD] } })
+                     return posts.findByIdAndUpdate(postID, { $push: { commentsID: [insertedCommentiD] } })
                   })
                   // .then(()=> 
                   // comment.findById('621fc5a898db7d65f61ca0f4').populate({ path: 'userID',select:["-password"]}).exec()
@@ -179,7 +183,7 @@ module.exports = {
     get posts from the DB from index to index.
     */
    async getLatestXPosts(numberOfPosts, from) {
-      const data = await Posts.aggregate(postAggregate)
+      const data = await posts.aggregate(postAggregate)
       return data
    },
 
