@@ -18,27 +18,27 @@ Content-Type:application/json
 }
 
 ###
-GET http://localhost:80/getData
-x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+GET http://localhost:80/post
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0OWRjNzRjZjgxNjk0MGY4YTY0MyIsInVzZXIiOiJlbGlyYW4yMjIiLCJpYXQiOjE2NTA5Njc0NDgsImV4cCI6MTY1MzU1OTQ0OH0.8DskMx_7DSNZfWtcMRquWncbyCfGHAFtEDvI_-oB-qI
 
 ###
 ### testing post 
 POST http://localhost:80/post 
-x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0ZDUxNzRjZjgxNjk0MGY4YTdiMiIsInVzZXIiOiJzaGlyYTM0MzIiLCJpYXQiOjE2NDYyMTg1OTQsImV4cCI6MTY0ODgxMDU5NH0._r-0bIbV3X7-KZUG2yTtpuC1BmmzzymT6qEevI95L5E
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0OWRjNzRjZjgxNjk0MGY4YTY0MyIsInVzZXIiOiJlbGlyYW4yMjIiLCJpYXQiOjE2NTA5Njc0NDgsImV4cCI6MTY1MzU1OTQ0OH0.8DskMx_7DSNZfWtcMRquWncbyCfGHAFtEDvI_-oB-qI
 Content-Type:application/json
 
 {
-    "content":"we love to write posts 2"
+    "content":"we love to write posts"
 }
 
 ###
 
 POST http://localhost:80/like 
-x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0OWRjNzRjZjgxNjk0MGY4YTY0MyIsInVzZXIiOiJlbGlyYW4yMjIiLCJpYXQiOjE2NTA5Njc0NDgsImV4cCI6MTY1MzU1OTQ0OH0.8DskMx_7DSNZfWtcMRquWncbyCfGHAFtEDvI_-oB-qI
 Content-Type:application/json
 
 {
-    "postCommentID":"6224a77580ea9ce759f41eaf"
+    "postCommentID":"6230e5c77de29094b2895fca"
 }
 
 ###
@@ -47,15 +47,15 @@ x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4
 Content-Type:application/json
 
 {
-    "postCommentID":"6224a77580ea9ce759f41eaf"
+    "postCommentID":"6224ea9ce759f41eaf"
 }
 ###
 POST http://localhost:80/comment 
-x-access-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWJhN2I4NGFkZTljZDdlYmU3ZWY0NiIsInVzZXIiOiJFbG5hdGFuMTEiLCJnZW5kZXIiOnRydWUsImlhdCI6MTY0NTk4NzUwNSwiZXhwIjoxNjQ4NTc5NTA1fQ.nnrq99RBO8vQf5Qoh6NslPPb4LAEpOTIpPOI8-_nnno
+x-access-token:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMWY0OWRjNzRjZjgxNjk0MGY4YTY0MyIsInVzZXIiOiJlbGlyYW4yMjIiLCJpYXQiOjE2NTA5NzA4MDksImV4cCI6MTY1MzU2MjgwOX0.vUeDaDwB-iblDUsnblDcW1wYIy51Y4_Qd36TplvbFbY
 Content-Type:application/json
 
 {
-    "postID":"6224a7aef648138258336806",
+    "postID":"621f49dc74cf816940f8a643",
     "content":"יש לך פוסט יפהפה"
     
 }
