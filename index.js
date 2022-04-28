@@ -28,18 +28,23 @@ app.use(express.json())
 app.post('/signIn',validateSignin,dataManager.checkIfSignedIn,dataManager.singIn); //
 
 app.post('/login',validatesLogin,dataManager.logIn);  // 
+app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
+    res.status(200).json({isLoggedIn:true})
+})
 
-app.post('/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)
+
 app.get('/post',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
     })
 })
-app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
-    res.status(200).json({isLoggedIn:true})
-})
-
 app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
+
+
+app.post('/post/:postId/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)
+
+
+
 
 app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
 app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//

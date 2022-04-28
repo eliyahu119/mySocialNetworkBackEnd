@@ -82,36 +82,36 @@ const removeLike = async (req, res) => {
  export the dataManager
 **/
 module.exports = {
-  /**
-   * checks if the id its post or comment,
-   * if its posts
-   * @param {*} req 
-   * @param {*} res 
-   * @param {*} next 
-   */
+   /**
+    * checks if the id its post or comment,
+    * if its posts
+    * @param {*} req 
+    * @param {*} res 
+    * @param {*} next 
+    */
    async checkPostOrCommentsExists(req, res, next) {
       let { postCommentID } = req.body
-      try{
-      //let postCommentID ='621f49dc74cf816940f8a643';
-      const postExits = await posts.exists({_id:postCommentID})
-      if (postExits) {
-         req.body.postOrComment = true; //like
-         next();
-      }
-      else {
-         const CommentExits = await comments.exists({ _id: postCommentID });
-         if (CommentExits) {
-            req.body.postOrComment = false; //comment
+      try {
+         //let postCommentID ='621f49dc74cf816940f8a643';
+         const postExits = await posts.exists({ _id: postCommentID })
+         if (postExits) {
+            req.body.postOrComment = true; //like
             next();
          }
-         else
-            res.status(404).json({ meassage: "post or commant does not exist" });
-         //if there is like remove it, if not add it
+         else {
+            const CommentExits = await comments.exists({ _id: postCommentID });
+            if (CommentExits) {
+               req.body.postOrComment = false; //comment
+               next();
+            }
+            else
+               res.status(404).json({ meassage: "post or commant does not exist" });
+            //if there is like remove it, if not add it
+         }
       }
-   }
-   catch(e){
-      res.status(500).json({message:e.meassage})
-   }
+      catch (e) {
+         res.status(500).json({ message: e.meassage })
+      }
    },
    addLike,
    removeLike,
@@ -140,52 +140,49 @@ module.exports = {
          .catch(err => res.json({ error: err }))
 
    },
+
    /**
-    * add comment to post.
+    * add comment to existing post.
+    * sends 200 if the request has Succeeded.
+    * sends 404 if the post wasn't found.
+    * sends 500 if there was an internal error.
+    * @param {object} req 
+    * @param {object} res 
     */
-   addComment(req, res) {
+   async addComment(req, res) {
       userID = req.user.id;
-      const { content, postID } = req.body
+      const { postId } = req.params;
+      const { content } = req.body
       const newComment = new comments({
          userID: new mongoose.Types.ObjectId(userID),
          content: content
       })
-      posts.exists({ _id: postID }).lean().exec().then(
-         exsist => {
-            if (exsist) {
-               let insertedCommentiD;
-               newComment.save().
-                  then(com => {
-                     insertedCommentiD = com._id.toString()
-                     //return the promis of the find
-                     return posts.findByIdAndUpdate(postID, { $push: { commentsID: [insertedCommentiD] } })
-                  })
-                  // .then(()=> 
-                  // comment.findById('621fc5a898db7d65f61ca0f4').populate({ path: 'userID',select:["-password"]}).exec()
-                  // )
-                  .then((data) => {
-                     //let id= insertedComment
-                     comments.findById(insertedCommentiD).populate({ path: 'userID', select: ["-password"] }).exec()
-                        .then(
-                           data => res.status(200).json({ meassage: "success", data: data })
-                        )
-                  })
-                  .catch(err => res.status(500).json({ error: "here" }))
-            } else {
-               res.status(404).json({ message: "post wasn't found" })
-            }
-         }
-      ).catch(e => res.status(500).json({ message: "the problem is here" }))
+   try{
+      const exists = await posts.exists({ _id: postId }).lean().exec()
+      if (exists) {
+         let insertedCommentiD;
+         const com= await newComment.save()
+         insertedCommentiD = com._id.toString()
+         //return the promis of the find
+         await posts.findByIdAndUpdate(postId, { $push: { commentsID: [insertedCommentiD] } })
+         let comment = await comments.findById(insertedCommentiD).populate({ path: 'userID', select: ["-password"] }).exec()
+         res.status(200).json({ meassage: "success", data: comment })
+      } else {
+         res.status(404).json({ message: "post wasn't found" })
+      }
+   }catch(e){
+   res.status(500).json({ message: err.meassage })
+   }
 
-   },
+},
 
    /**
     get posts from the DB from index to index.
     */
    async getLatestXPosts(numberOfPosts, from) {
-      const data = await posts.aggregate(postAggregate)
-      return data
-   },
+   const data = await posts.aggregate(postAggregate)
+   return data
+},
 
 
    /**
@@ -196,18 +193,18 @@ module.exports = {
     * @param {function} next 
     */
    async checkIfSignedIn(req, res, next) {
-      let { user, email } = req.body
-      try {
-         if (await users.exists().or([{ email }, { user }])) {
-            res.status(422).json({ message: "userName or Email already been used " });
-         }
-         else
-            next();
+   let { user, email } = req.body
+   try {
+      if (await users.exists().or([{ email }, { user }])) {
+         res.status(422).json({ message: "userName or Email already been used " });
       }
-      catch {
-         res.status(500).json({ message: 'the' })
-      }
-   },
+      else
+         next();
+   }
+   catch {
+      res.status(500).json({ message: 'the' })
+   }
+},
 
    /**
    the sign in function
@@ -216,89 +213,89 @@ module.exports = {
    200 if all is well.
     **/
    async singIn(req, res) {
-      let { user, password, email, gender } = req.body
-      password = await bcrypt.hash(password, 10); //TODO: consider using salts instead of  rounds
-      const dbUser = new users(
-         {
-            user,
-            password,
-            email,
-            gender  //true is male, false female
-         }
-      );
-      try {
-         const SavedUser = await dbUser.save()
-         res.status(200).json({ message: `${SavedUser.user} has been added` });
-      } catch (err) {
-         err => res.status(500).json({ message: `there was an internal problem, ${err}` });
+   let { user, password, email, gender } = req.body
+   password = await bcrypt.hash(password, 10); //TODO: consider using salts instead of  rounds
+   const dbUser = new users(
+      {
+         user,
+         password,
+         email,
+         gender  //true is male, false female
       }
-
-   },
-
-   /**
-   login to the page
-   and sents jwt to the client
-   **/
-   logIn(req, res) {
-      const { user, password } = req.body;
-      //check if password or user is not string
-      /*
-      HERE
-      */
-      users.findOne({ user }).lean().then(
-         DBuser => {
-            if (!DBuser)
-               return res.status(400).json({ message: 'Invalid username or password' });
-            const { password: DBpassword, ...userInfo } = DBuser
-            bcrypt.compare(password, DBpassword).then(
-               isCorrect => {
-                  if (isCorrect) {
-                     const payload = {
-                        id: DBuser._id,
-                        user: DBuser.user,
-                     }
-                     jwt.sign(payload,
-                        process.env.JWT_SECRET,
-                        { expiresIn: 86400 * 30 }, //for 30 days
-                        (err, token) => {
-                           if (err) return res.status(500).json({ message: err })
-                           return res.status(200).json({
-                              message: "Success",
-                              token: `Bearer ${token}`,
-                              userInfo
-                           })
-                        }
-                     )
-
-                  }
-                  else {
-                     return res.status(400).json({ message: 'Invalid username or password' });
-                  }
-               }
-            )
-         }
-
-
-      ).catch(
-         (e) => res.status(500).json({ message: `There was an internal problem, ${e} ` })
-      )
-   },
-   /**
-   the mittleware of the pogram, checks if
-   the jwt is valid.
-    */
-   verifyJWT(req, res, next) {
-      const token = req.headers['x-access-token']?.split(' ')[1]
-      if (token) {
-         jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-            if (err) {
-               return res.sendStatus(401)
-            }
-            req.user = { id: decoded.id, user: decoded.user };
-            next();
-         })
-      }
-      else
-         return res.sendStatus(401)
+   );
+   try {
+      const SavedUser = await dbUser.save()
+      res.status(200).json({ message: `${SavedUser.user} has been added` });
+   } catch (err) {
+      err => res.status(500).json({ message: `there was an internal problem, ${err}` });
    }
+
+},
+
+/**
+login to the page
+and sents jwt to the client
+**/
+logIn(req, res) {
+   const { user, password } = req.body;
+   //check if password or user is not string
+   /*
+   HERE
+   */
+   users.findOne({ user }).lean().then(
+      DBuser => {
+         if (!DBuser)
+            return res.status(400).json({ message: 'Invalid username or password' });
+         const { password: DBpassword, ...userInfo } = DBuser
+         bcrypt.compare(password, DBpassword).then(
+            isCorrect => {
+               if (isCorrect) {
+                  const payload = {
+                     id: DBuser._id,
+                     user: DBuser.user,
+                  }
+                  jwt.sign(payload,
+                     process.env.JWT_SECRET,
+                     { expiresIn: 86400 * 30 }, //for 30 days
+                     (err, token) => {
+                        if (err) return res.status(500).json({ message: err })
+                        return res.status(200).json({
+                           message: "Success",
+                           token: `Bearer ${token}`,
+                           userInfo
+                        })
+                     }
+                  )
+
+               }
+               else {
+                  return res.status(400).json({ message: 'Invalid username or password' });
+               }
+            }
+         )
+      }
+
+
+   ).catch(
+      (e) => res.status(500).json({ message: `There was an internal problem, ${e} ` })
+   )
+},
+/**
+the mittleware of the pogram, checks if
+the jwt is valid.
+ */
+verifyJWT(req, res, next) {
+   const token = req.headers['x-access-token']?.split(' ')[1]
+   if (token) {
+      jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+         if (err) {
+            return res.sendStatus(401)
+         }
+         req.user = { id: decoded.id, user: decoded.user };
+         next();
+      })
+   }
+   else
+      return res.sendStatus(401)
+}
 }
