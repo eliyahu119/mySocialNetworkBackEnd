@@ -7,9 +7,10 @@ Joi.objectId = require('joi-objectid')(Joi)
 module.exports = {
     validateSignin,
     validatesLogin,
-    valdatesAddLike,
+    validatePostLike,
     valdatesComment,
-    validtaePost
+    validtaePost,
+    validateCommentLike
 }
 
 /**
@@ -76,12 +77,19 @@ function validatesLogin(req, res, next) {
  * @param {object} res 
  * @param {function} next 
  */
-function valdatesAddLike(req, res, next) {
+function validatePostLike(req, res, next) {
     const JoiSchema = Joi.object({
-        postCommentID: Joi.objectId()
-
+        postId: Joi.objectId()
     });
-    validation(JoiSchema, null, res, req, next);
+    validation(null, JoiSchema, res, req, next);
+}
+
+function validateCommentLike(req, res, next) {
+    const JoiSchema = Joi.object({
+        postId: Joi.objectId(),
+        commentId: Joi.objectId()
+    });
+    validation(null, JoiSchema, res, req, next);
 }
 
 /**

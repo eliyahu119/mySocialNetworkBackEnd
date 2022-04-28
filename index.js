@@ -5,9 +5,10 @@ const bodyParser=require('body-parser')
 const {
     validateSignin,
     validatesLogin,
-    valdatesAddLike,
+    validatePostLike,
     valdatesComment,
-    validtaePost
+    validtaePost,
+    validateCommentLike
 } =require('./validation')
 
 const path = require('path');
@@ -40,14 +41,19 @@ app.get('/post',dataManager.verifyJWT,(req, res)=>{
 })
 app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
 
+app.post('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.addPostLike)//
+app.delete('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.removePostLike)//
 
-app.post('/post/:postId/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)
+app.post('/post/:postId/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)//
+
+app.post('/post/:postId/comment/:commentId/like',dataManager.verifyJWT,validateCommentLike,dataManager.addCommentLike)//
+app.delete('/post/:postId/comment/:commentId/like',dataManager.verifyJWT,validateCommentLike,dataManager.removCommentLike)//
 
 
 
 
-app.post('/like',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
-app.post('/rlike',dataManager.verifyJWT,valdatesAddLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//
+//app.post('/like',dataManager.verifyJWT,validatePostLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
+//app.post('/rlike',dataManager.verifyJWT,validatePostLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//
 
 //simple http server
 //const path='./build'
