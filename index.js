@@ -30,7 +30,7 @@ app.post('/signIn',validateSignin,dataManager.checkIfSignedIn,dataManager.singIn
 app.post('/login',validatesLogin,dataManager.logIn);  // 
 
 app.post('/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)
-app.get('/getData',dataManager.verifyJWT,(req, res)=>{
+app.get('/post',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
     })
