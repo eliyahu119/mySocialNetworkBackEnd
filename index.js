@@ -38,8 +38,9 @@ app.get('/post',dataManager.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
     })
-})
+}) //
 app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
+
 
 app.post('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.addPostLike)//
 app.delete('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.removePostLike)//
@@ -52,8 +53,6 @@ app.delete('/post/:postId/comment/:commentId/like',dataManager.verifyJWT,validat
 
 
 
-//app.post('/like',dataManager.verifyJWT,validatePostLike,dataManager.checkPostOrCommentsExists,dataManager.addLike)//
-//app.post('/rlike',dataManager.verifyJWT,validatePostLike,dataManager.checkPostOrCommentsExists,dataManager.removeLike)//
 
 //simple http server
 //const path='./build'
