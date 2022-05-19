@@ -1,6 +1,7 @@
 require('dotenv').config(); 
 const express = require('express');
 const dataManager=require('./dataManager');
+const log=require('./log')
 const bodyParser=require('body-parser')
 const {
     validateSignin,
@@ -26,29 +27,29 @@ app.use(express.json())
 
 
 
-app.post('/signIn',validateSignin,dataManager.checkIfSignedIn,dataManager.singIn); //
+app.post('/signIn',validateSignin,log.checkIfSignedIn,log.singIn); //
 
-app.post('/login',validatesLogin,dataManager.logIn);  // 
-app.get('/isUserAuth',dataManager.verifyJWT,(req, res)=>{
+app.post('/login',validatesLogin,log.logIn);  // 
+app.get('/isUserAuth',log.verifyJWT,(req, res)=>{
     res.status(200).json({isLoggedIn:true})
 })
 
 
-app.get('/post',dataManager.verifyJWT,(req, res)=>{
+app.get('/post',log.verifyJWT,(req, res)=>{
     dataManager.getLatestXPosts(5,0).then(data=>{
     res.json(data);
     })
 }) //
-app.post('/post',dataManager.verifyJWT,validtaePost,dataManager.setPost);//
+app.post('/post',log.verifyJWT,validtaePost,dataManager.setPost);//
 
 
-app.post('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.addPostLike)//
-app.delete('/post/:postId/like',dataManager.verifyJWT,validatePostLike,dataManager.removePostLike)//
+app.post('/post/:postId/like',log.verifyJWT,validatePostLike,dataManager.addPostLike)//
+app.delete('/post/:postId/like',log.verifyJWT,validatePostLike,dataManager.removePostLike)//
 
-app.post('/post/:postId/comment',dataManager.verifyJWT,valdatesComment,dataManager.addComment)//
+app.post('/post/:postId/comment',log.verifyJWT,valdatesComment,dataManager.addComment)//
 
-app.post('/post/:postId/comment/:commentId/like',dataManager.verifyJWT,validateCommentLike,dataManager.addCommentLike)//
-app.delete('/post/:postId/comment/:commentId/like',dataManager.verifyJWT,validateCommentLike,dataManager.removCommentLike)//
+app.post('/post/:postId/comment/:commentId/like',log.verifyJWT,validateCommentLike,dataManager.addCommentLike)//
+app.delete('/post/:postId/comment/:commentId/like',log.verifyJWT,validateCommentLike,dataManager.removCommentLike)//
 
 
 
