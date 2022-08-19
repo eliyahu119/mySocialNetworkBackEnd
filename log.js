@@ -6,7 +6,7 @@ const {
   statusCodes,
   sendInternalErrorAsRespond,
 } = require("./utils/httpUtils");
-const {milisecondTo}=require('./utils')
+const { milisecondTo } = require("./utils");
 module.exports = {
   /**
    the sign in function
@@ -67,11 +67,16 @@ module.exports = {
           if (err) {
             sendInternalErrorAsRespond(res, err);
           }
-          return res.status(statusCode.OK).json({
-            message: "Success",
-            token: `Bearer ${token}`,
-            userInfo,
-          });
+          console.log("ok");
+          try {
+            res.status(statusCodes.OK).json({
+              message: "Success",
+              token: `Bearer ${token}`,
+              userInfo,
+            });
+          } catch (error) {
+            console.log(error);
+          }
         }
       );
     } catch (err) {
