@@ -27,7 +27,7 @@ mongoose.connect(
  * @param {object} req
  * @param {object} res
  */
-const addPostLike = async (req, res) => {
+ async function addPostLike (req, res)  {
   const userID = mongoose.Types.ObjectId(req.user.id);
   const { postId } = req.params;
   //if true its post, false its a comment.
@@ -51,7 +51,7 @@ const addPostLike = async (req, res) => {
  * @param {object} req
  * @param {object} res
  */
-const removePostLike = async (req, res) => {
+ async function removePostLike (req, res)  {
   const userID = mongoose.Types.ObjectId(req.user.id);
   const { postId } = req.params;
   try {
@@ -91,7 +91,7 @@ async function addCommentLike(req, res) {
   }
 }
 
-const removCommentLike = async (req, res) => {
+async function removCommentLike (req, res)  {
   const userID = mongoose.Types.ObjectId(req.user.id);
   const { commentId } = req.params;
   try {
@@ -103,81 +103,85 @@ const removCommentLike = async (req, res) => {
 };
 
 /**
- export the dataManager
-**/
-module.exports = {
-  addPostLike,
-  addCommentLike,
-  removePostLike,
-  removCommentLike,
+ * Retrieves latest X posts from the DB.
+ * @param {number} numberOfPosts - Number of posts to retrieve.
+ * @param {number} from - Start index.
+ * @returns {Promise} - Promise with the retrieved posts.
+ */
+async function getLatestXPosts(numberOfPosts, from) {
+  const data = await posts.aggregate(postAggregate);
+  return data;
+}
 
-  /**
-  set post function
-   */
-  async setPost(req, res) {
-    try {
-      userID = req.user.id;
-      const { content } = req.body;
-
-      const newPost = new posts({
-        userID: new mongoose.Types.ObjectId(userID),
-        content: content,
+/**
+ * Adds a comment to an existing post.
+ * @param {object} req
+ * @param {object} res
+ */
+async function addComment(req, res) {
+  userID = req.user.id;
+  const { postId } = req.params;
+  const { content } = req.body;
+  const newComment = new comments({
+    userID: new mongoose.Types.ObjectId(userID),
+    content: content,
+  });
+  try {
+    const exists = await posts.exists({ _id: postId }).lean().exec();
+    if (exists) {
+      let insertedCommentID;
+      const com = await newComment.save();
+      insertedCommentID = com._id.toString();
+      await posts.findByIdAndUpdate(postId, {
+        $push: { commentsID: [insertedCommentID] },
       });
-      //TODO: MAKE THIS CRAP WORK WITH SAVE ONLY
-      let post = await newPost.save();
-      post = await posts
-        .findById(post.id)
+      let comment = await comments
+        .findById(insertedCommentID)
         .populate({ path: "userID", select: ["-password"] })
         .exec();
-      res.status(statusCodes.OK).json(post);
-    } catch (err) {
-      sendInternalErrorAsRespond(err, res);
+      res.status(statusCodes.OK).json({ message: "success", data: comment });
+    } else {
+      res.status(statusCodes.NOT_FOUND).json({ message: "post wasn't found" });
     }
-  },
+  } catch (err) {
+    sendInternalErrorAsRespond(err, res);
+  }
+}
 
-  /**
-   * add comment to existing post.
-   * @param {object} req
-   * @param {object} res
-   */
-  async addComment(req, res) {
-    userID = req.user.id;
-    const { postId } = req.params;
+/**
+ * Sets a new post.
+ * @param {object} req
+ * @param {object} res
+ */
+async function setPost(req, res) {
+  try {
+    const userID = req.user.id;
     const { content } = req.body;
-    const newComment = new comments({
+
+    const newPost = new posts({
       userID: new mongoose.Types.ObjectId(userID),
       content: content,
     });
-    try {
-      const exists = await posts.exists({ _id: postId }).lean().exec();
-      if (exists) {
-        let insertedCommentiD;
-        const com = await newComment.save();
-        insertedCommentiD = com._id.toString();
-        //return the promis of the find
-        await posts.findByIdAndUpdate(postId, {
-          $push: { commentsID: [insertedCommentiD] },
-        });
-        let comment = await comments
-          .findById(insertedCommentiD)
-          .populate({ path: "userID", select: ["-password"] })
-          .exec();
-        res.status(statusCodes.OK).json({ meassage: "success", data: comment });
-      } else {
-        res
-          .status(statusCodes.NOT_FOUND)
-          .json({ message: "post wasn't found" });
-      }
-    } catch (err) {
-      sendInternalErrorAsRespond(err, res);
-    }
-  },
 
-  /**
-    get posts from the DB from index to index.
-    */
-  async getLatestXPosts(numberOfPosts, from) {
-    const data = await posts.aggregate(postAggregate);
-    return data;
-  },
+    let post = await newPost.save();
+    post = await posts
+      .findById(post.id)
+      .populate({ path: "userID", select: ["-password"] })
+      .exec();
+
+    res.status(statusCodes.OK).json(post);
+  } catch (err) {
+    sendInternalErrorAsRespond(err, res);
+  }
+}
+
+module.exports = {
+  addPostLike,
+  removePostLike,
+  addCommentLike,
+  removCommentLike,
+  setPost,
+  addComment,
+  getLatestXPosts,
 };
+
